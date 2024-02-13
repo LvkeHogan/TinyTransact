@@ -1,3 +1,4 @@
+//Class to establish the basic methods needed.
 public class transact {
 
     public static String cardCheck(long cardNum) {
@@ -91,13 +92,23 @@ public class transact {
     
     
     public static void debit(float charge, int cardNum){
-        //Debit funds from the specified account
+        // TODO Debit funds from the specified account
 
     }
 
     public static void refund(float charge, int cardNum){
-        //Credit funds to the specified account
+        // TODO Credit funds to the specified account
 
+    }
+
+    public static String createAcct(String firstName, String lastName, long cardNum){
+        String result = "invalid";
+        // TODO issue an account number
+
+        // TODO issue a card number
+
+        // TODO deposit funds into account
+        return result;
     }
 
 
