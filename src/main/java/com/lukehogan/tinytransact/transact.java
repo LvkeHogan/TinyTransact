@@ -1,4 +1,8 @@
-//Class to establish the basic methods needed.
+package com.lukehogan.tinytransact;
+
+import java.util.random.*;
+
+//Class to establish the basic methods needed for the system
 public class transact {
 
     public static String cardCheck(long cardNum) {
@@ -90,25 +94,73 @@ public class transact {
     }
 
     
+    //method to charge a bank account using an issued credit card
+    public static String debit(float amount, int cardNum){
+        String dummy = "incomplete";
+        // TODO run a card check. return error if DNE or not issued
+        
+        // TODO locate the associated bank account number from the card table
+
+        // TODO update funds to add the refund
+
+        // TODO return approved, denied, and card type, or indicate card is invalid or unissied
+
+        return dummy;
+    }
+
+    //method to refund a bank account using an issued credit card
+    public static String refund(float amount, int cardNum){
+        String dummy = "incomplete";
+        // TODO run a card check. return error if DNE or not issued
+        
+        // TODO locate the associated bank account number from the card table
+
+        // TODO update funds to add the refund
+
+        // TODO return approved, denied, and card type, or indicate card is invalid or unissied
+
+        return dummy;
+    }
+
+    //method to deposit funds into a bank account
+    public static String deposit(float amount, int accountNum){
+        String dummy = "incomplete";
+        // TODO check if account exists
+
+        // TODO complete the transaction and return result.
+
+        return dummy;
+    }
+
+    //method to withdrawl funds from a bank account
+    public static String withdraw(float amount, int accountNum){
+        String dummy = "incomplete";
+        // TODO check if account exists
+
+        // TODO complete the transaction and return result.
+
+        return dummy;
+    }
     
-    public static void debit(float charge, int cardNum){
-        // TODO Debit funds from the specified account
-
-    }
-
-    public static void refund(float charge, int cardNum){
-        // TODO Credit funds to the specified account
-
-    }
-
-    public static String createAcct(String firstName, String lastName, long cardNum){
+    //method to create a bank account
+    public static String createAcct(String firstName, String lastName, float deposit){
         String result = "invalid";
-        // TODO issue an account number
+        // TODO issue an 11 digit account number
 
-        // TODO issue a card number
+        // TODO add the account info into the database
 
-        // TODO deposit funds into account
         return result;
+    }
+
+    public static float addCard(long accountNum, String type){
+        float dummy = 9999999999999999L;
+        // TODO ensure input is valid
+
+        // TODO generate a card number of the specified type
+
+        // TODO add to database, link to the account.
+
+        return dummy;
     }
 
 
