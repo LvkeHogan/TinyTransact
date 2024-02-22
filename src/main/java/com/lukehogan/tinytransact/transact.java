@@ -98,7 +98,10 @@ public class transact {
     public static String debit(float amount, int cardNum){
         String dummy = "incomplete";
         // TODO run a card check. return error if DNE or not issued
-        
+        String checkResult = cardCheck(cardNum);
+        if(checkResult == "invalid"){
+            return("invalid");
+        }
         // TODO locate the associated bank account number from the card table
 
         // TODO update funds to add the refund
@@ -154,7 +157,7 @@ public class transact {
 
     public static float addCard(long accountNum, String type){
         float dummy = 9999999999999999L;
-        // TODO ensure input is valid
+        // TODO ensure account exists. If it doesn't, return an error.
 
         // TODO generate a card number of the specified type
 
