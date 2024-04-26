@@ -1,11 +1,13 @@
 package com.lukehogan.tinytransact.model;
 
+import java.util.List;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.Column;
 
 @Entity
 @Table(name="Accounts")
@@ -13,30 +15,31 @@ public class Account {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int custID;
+    private int id;
 
-    @Column(name = "firstname")
     private String firstName;
 
-    @Column(name = "lastname")
     private String lastName;
 
-    @Column(name = "acctnum")
     private Long acctNum;
-
+    
+    @OneToMany(mappedBy = "Account")
+    private List<Card> cards;
+    
     private double balance;
 
-    //empty constructor needed for Hibernate/jpa to bring data into the application.
+    //empty constructor for Hibernate/JPA
     public Account() {
 
     }
 
     //auxiliary constructor
-    public Account(String firstName, String lastName, Long acctNum, double balance) {
+    public Account(String firstName, String lastName, Long acctNum, double balance, List<Card> cards) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.acctNum = acctNum;
         this.balance = balance;
+        this.cards = cards;
     }
 
     //getters
@@ -68,6 +71,14 @@ public class Account {
     public void setBalance(double newBalance) {
         this.balance = newBalance;
     }
+
+	public List<Card> getCards() {
+		return cards;
+	}
+
+	public void setCards(List<Card> cards) {
+		this.cards = cards;
+	}
 
 
 }

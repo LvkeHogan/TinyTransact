@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -13,24 +14,25 @@ public class Card {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int cardID;
-
-    private int acctID;
+    private int id;
+    
+    @ManyToOne
+    private Account account;
 
     private String type;
 
     @Column(name = "cardnum")
     private long cardNum;
 
-    //Empty jpa constructor
+    //Empty constructor for JPA
     public Card(){
 
     }
 
     //auxiliary constructor
-    public Card(int cardID, int acctID, String type, long cardNum){
-        this.cardID = cardID;
-        this.acctID = acctID;
+    public Card(int cardID, Account account, String type, long cardNum){
+        this.id = cardID;
+        this.account = account;
         this.type = type;
         this.cardNum = cardNum;
     }
@@ -45,10 +47,9 @@ public class Card {
         return cardNum;
     }
 
-    //Setters: Only card number change supported (i.e. when a card gets stolen and you need to issue a new one)
+    public Account getAccount() {
+		return account;
+	}
 
-    public void setCardNum(long newCardNum){
-        this.cardNum = newCardNum;
-    }
 
 }

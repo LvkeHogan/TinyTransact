@@ -1,4 +1,4 @@
-package com.lukehogan.tinytransact;
+package com.lukehogan.tinytransact.transact;
 
 import java.util.random.*;
 
