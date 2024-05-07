@@ -17,6 +17,7 @@ public class Card {
     private int id;
     
     @ManyToOne
+    //how to specify which column the account id from the object is stored in? How to specify?
     private Account account;
 
     private String type;
