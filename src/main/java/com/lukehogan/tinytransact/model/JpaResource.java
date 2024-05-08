@@ -26,15 +26,28 @@ public class JpaResource {
 	
 	//**Accounts**
 	// TODO Show All Accounts
+	// Method GET /accounts
+	// Inputs: None
+	// Outputs: All accounts in JSON
 	
 	
 	// TODO Get specific account by number
+	// Method POST /accounts
+	// Inputs: Account Number (request body)
+	// Outputs: Account Details
 	
 	
 	// TODO Create new account
+	// Method POST /accounts/create
+	// Inputs: name, address, phone number, initial deposit, etc.
+	// Outputs: Newly Issued Account Number
 	
 	
 	// TODO Close existing account
+	// Method POST /accounts/close
+	// Inputs: account number
+	// Outputs: returned funds
+	
 	
 	//**Cards**
 	// TODO Issue new card
@@ -48,6 +61,7 @@ public class JpaResource {
 	// Inputs: Card number
 	// Outputs: None
 	
+	
 	// TODO Reissue existing card
 	// Method POST /card/issue
 	// Inputs: Current card number
@@ -57,17 +71,27 @@ public class JpaResource {
 	
 	//**Transactions**
 	// TODO Account deposit
-	// Method PATCH /deposit
-	// Inputs: Account Number, Desired Type (amex, mastercard etc)
+	// Method PATCH /accounts/deposit
+	// Inputs: Account Number, deposit amount (has to be 2 decimal places)
 	// Outputs: new balance
 	
+	
 	// TODO Account withdraw
+	// Method PATCH /accounts/withdraw
+	// Inputs: Account Number, withdraw amount (has to be 2 decimal places)
+	// Outputs: new balance
 	
 	
-	// TODO Credit card transaction
+	// TODO Credit card charge
+	// Method PATCH /card/charge
+	// Inputs: Credit card number, charge amount (has to be 2 decimal places)
+	// Outputs: charge amount or insufficient funds
 	
 	
 	// TODO Credit card refund
+	// Method PATCH /card/refund
+	// Inputs: Credit card number, refund amount (has to be 2 decimal places)
+	// Outputs: charge amount or insufficient funds
 	
 	
 	
