@@ -1,6 +1,11 @@
 package com.lukehogan.tinytransact.model;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lukehogan.tinytransact.jpa.AccountRepository;
@@ -25,16 +30,26 @@ public class JpaResource {
 	//***API Methods***
 	
 	//**Accounts**
-	// TODO Show All Accounts
+	
+	//Show All Accounts
 	// Method GET /accounts
 	// Inputs: None
 	// Outputs: All accounts in JSON
+	@GetMapping("/accounts")
+	public List<Account> getAllAccounts(){
+		return accountRepository.findAll();
+	}
 	
 	
 	// TODO Get specific account by number
 	// Method POST /accounts
 	// Inputs: Account Number (request body)
 	// Outputs: Account Details
+	@PostMapping("/accounts")
+	public Account getAccountByNum(@RequestBody Account account) {
+		Account foundAccount = 
+		
+	}
 	
 	
 	// TODO Create new account

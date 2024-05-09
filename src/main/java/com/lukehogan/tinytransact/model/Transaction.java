@@ -1,14 +1,14 @@
 package com.lukehogan.tinytransact.model;
 
+import java.sql.Timestamp;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-
-import java.sql.Timestamp;
-
-import jakarta.persistence.Column;
 
 @Entity
 @Table(name = "Transactions")
@@ -18,11 +18,15 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int transactionID;
 
-    private int acctID;
+    @ManyToOne
+    @JoinColumn(name = "accountId")
+    private Account account;
 
     private double amount;
-
-    @Column(name = "transacttime")
+    
+    // TODO add card relationship onetoone
+    
+    // TODO what data type should we use for this?
     private Timestamp time;
 
     //empty constructor needed for Hibernate/jpa to bring data into the application.
@@ -31,8 +35,8 @@ public class Transaction {
     }
 
     //auxiliary constructor
-    public Transaction(int acctID, double amount, Timestamp time){
-        this.acctID = acctID;
+    public Transaction(Account account, double amount, Timestamp time){
+        this.account = account;
         this.amount = amount;
         this.time = time;
     }

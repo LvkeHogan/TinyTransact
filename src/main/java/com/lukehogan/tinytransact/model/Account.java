@@ -15,16 +15,17 @@ public class Account {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private int accountNum;
 
     private String firstName;
 
     private String lastName;
-
-    private Long acctNum;
     
-    @OneToMany(mappedBy = "Account")
+    @OneToMany(mappedBy = "account")
     private List<Card> cards;
+    
+    @OneToMany(mappedBy = "account")
+    private List<Transaction> transactions;
     
     private double balance;
 
@@ -34,10 +35,9 @@ public class Account {
     }
 
     //auxiliary constructor
-    public Account(String firstName, String lastName, Long acctNum, double balance, List<Card> cards) {
+    public Account(String firstName, String lastName, double balance, List<Card> cards) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.acctNum = acctNum;
         this.balance = balance;
         this.cards = cards;
     }
@@ -51,8 +51,8 @@ public class Account {
         return lastName;
     }
 
-    public long getAcctNum() {
-        return acctNum;
+    public int getAccountNum() {
+        return accountNum;
     }
 
     public double getBalance() {
@@ -75,7 +75,8 @@ public class Account {
 	public List<Card> getCards() {
 		return cards;
 	}
-
+	
+	// TODO this method needs improved. Need to decide if we're going to manage the card list here or outside.
 	public void setCards(List<Card> cards) {
 		this.cards = cards;
 	}
