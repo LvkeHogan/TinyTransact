@@ -15,7 +15,9 @@ public class Account {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int accountNum;
+    private int id;
+    
+    private int accountNumber;
 
     private String firstName;
 
@@ -51,11 +53,15 @@ public class Account {
         return lastName;
     }
 
-    public int getAccountNum() {
-        return accountNum;
+    public int getId() {
+        return id;
     }
 
-    public double getBalance() {
+    public int getAccountNumber() {
+		return accountNumber;
+	}
+
+	public double getBalance() {
         return balance;
     }
 

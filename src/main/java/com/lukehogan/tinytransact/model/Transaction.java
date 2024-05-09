@@ -1,6 +1,6 @@
 package com.lukehogan.tinytransact.model;
 
-import java.sql.Timestamp;
+import java.time.OffsetDateTime;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -19,44 +19,49 @@ public class Transaction {
     private int transactionID;
 
     @ManyToOne
-    @JoinColumn(name = "accountId")
+    @JoinColumn(name = "accountId", nullable = true)
     private Account account;
 
     private double amount;
     
-    // TODO add card relationship onetoone
+    @ManyToOne
+    @JoinColumn(name = "cardId", nullable = true)
+    private Card card;
     
-    // TODO what data type should we use for this?
-    private Timestamp time;
+    
+    
+    //to get current timestamp upon entity creation, OffsetDateTime.now(ZoneOffset.UTC)
+    private OffsetDateTime time;
 
     //empty constructor needed for Hibernate/jpa to bring data into the application.
     public Transaction(){
 
     }
 
-    //auxiliary constructor
-    public Transaction(Account account, double amount, Timestamp time){
+    //Constructor to allow bank deposit/withdraw
+    public Transaction(Account account, double amount, OffsetDateTime time){
         this.account = account;
         this.amount = amount;
         this.time = time;
     }
-
+    
+    
+    //Constructor to allow card transactions
+    public Transaction(Card card, double amount, OffsetDateTime time){
+        this.card = card;
+        this.amount = amount;
+        this.time = time;
+    }
+    
     //getters
     public double getAmount(){
         return amount;
     }
 
-    public Timestamp getTime(){
+    public OffsetDateTime getTime(){
         return time;
     }
 
-    //setters
-    public void setAmount(double newAmount){
-        this.amount = newAmount;
-    }
-
-    public void setTime(Timestamp newTime){
-        this.time = newTime;
-    }
+    //No setters defined; after a transaction is made, these values can't be changed.
 
 }
