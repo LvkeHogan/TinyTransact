@@ -1,6 +1,7 @@
 package com.lukehogan.tinytransact.model;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,8 +47,12 @@ public class JpaResource {
 	// Inputs: Account Number (request body)
 	// Outputs: Account Details
 	@PostMapping("/accounts")
-	public Account getAccountByNum(@RequestBody Account account) {
-		Account foundAccount = 
+	public Account getAccountByNum(@RequestBody AccountRequest request) {
+		Optional<Account> foundAccount = accountRepository.findByAccountNumber(request.getAccountNumber());
+		
+		// TODO this is a dummy for now. Need to handle exception if no account is returned.
+		return foundAccount.get();
+		
 		
 	}
 	
