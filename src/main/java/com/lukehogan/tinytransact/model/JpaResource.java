@@ -114,6 +114,34 @@ public class JpaResource {
 	// Outputs: charge amount or insufficient funds
 	
 	
+	// TODO get all transactions
+	////Method GET /transactions
 	
+	// TODO get transactions by date range
+	//Method POST /transactions/date
+	//Inputs: Start date, End date
+	//Outputs: List of transactions within the range, for all cards and accounts
+
+//	public List<Transaction> getTransactionByDateRange(@RequestBody TransactionLookupRequest request){
+//		//if start date is after end date, return error
+//		
+//		
+//		//if start and end date are the same, set the end date to the end of the day. We want values exclusive of the next day.
+//		
+//		
+//		
+//		
+//	}
+//	
+	
+	// TODO get transactions by card and date range. Handle empty dates as wanting all.
+	//Method POST /transactions/card
+	//Inputs: Start date, End date
+	//Outputs: List of transactions within the range, for all cards and accounts
+	
+	// TODO get transactions by account. Handle empty dates as wanting all.
+	//Method POST /transactions/account
+	//Inputs: Card Number, Start date, End date
+	//Outputs: List of transactions within the range, for all cards and accounts
 	
 }

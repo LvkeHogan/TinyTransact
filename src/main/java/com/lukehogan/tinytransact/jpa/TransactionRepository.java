@@ -17,9 +17,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
 	Optional<List<Transaction>> findByCardId(int cardId);
 	
 	
-	// TODO find transactions by day
-	
-	
 	// TODO find transactions by datetime range
 	
 	
