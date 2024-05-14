@@ -1,5 +1,8 @@
 package com.lukehogan.tinytransact.model;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class AccountRequest {
 	private int accountNumber;
 	private String firstName;

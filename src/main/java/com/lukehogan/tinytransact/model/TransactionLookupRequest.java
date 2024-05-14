@@ -2,31 +2,34 @@ package com.lukehogan.tinytransact.model;
 
 import java.time.OffsetDateTime;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class TransactionLookupRequest {
 	
-	private OffsetDateTime beginDate;
-	private OffsetDateTime endDate;
+	private OffsetDateTime beginTimestamp;
+	private OffsetDateTime endTimestamp;
 	private Integer accountNum;
-	private Integer cardNum;
+	private Long cardNum;
 	
 	//getters
-	public OffsetDateTime getBeginDate() {
-		return beginDate;
+	public OffsetDateTime getBeginTimestamp() {
+		return beginTimestamp;
 	}
-	public OffsetDateTime getEndDate() {
-		return endDate;
+	public OffsetDateTime getEndTimestamp() {
+		return endTimestamp;
 	}
 	public Integer getAccountNum() {
 		return accountNum;
 	}
-	public Integer getCardNum() {
+	public Long getCardNum() {
 		return cardNum;
 	}
 	public TransactionLookupRequest(OffsetDateTime beginDate, OffsetDateTime endDate, Integer accountNum,
 			Integer cardNum) {
 		super();
-		this.beginDate = beginDate;
-		this.endDate = endDate;
+		this.beginTimestamp = beginDate;
+		this.endTimestamp = endDate;
 		this.accountNum = accountNum;
 		this.cardNum = cardNum;
 	}

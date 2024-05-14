@@ -1,5 +1,6 @@
 package com.lukehogan.tinytransact.jpa;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,10 +15,17 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
 	Optional<List<Transaction>> findByAccountId(int accountId);
 	
 	//Find transactions by card id
-	Optional<List<Transaction>> findByCardId(int cardId);
+	Optional<List<Transaction>> findByCardId(Long cardId);
 	
+	//Find transactions by datetime range
+	Optional<List<Transaction>> findByTimeBetween(OffsetDateTime beginTime, OffsetDateTime endTime);
 	
-	// TODO find transactions by datetime range
+	//Find Account transactions by datetime range
+	Optional<List<Transaction>> findByAccountAndTimeBetween(int accountNum, OffsetDateTime beginTime, OffsetDateTime endTime);
 	
+	//Find Card transactions by datetime range
+	Optional<List<Transaction>> findByCardAndTimeBetween(Long cardNum, OffsetDateTime beginTime, OffsetDateTime endTime);
 	
 }
+
+//https://docs.spring.io/spring-data/jpa/reference/jpa/query-methods.html
