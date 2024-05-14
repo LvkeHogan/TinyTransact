@@ -45,16 +45,23 @@ public class JpaResource {
 	}
 	
 	
-	// TODO Get specific account by number
+	//Get specific account by number
 	// Method POST /accounts
 	// Inputs: Account Number (request body)
 	// Outputs: Account Details
 	@PostMapping("/accounts")
 	public Account getAccountByNum(@RequestBody AccountRequest request) {
-		Optional<Account> foundAccount = accountRepository.findByAccountNumber(request.getAccountNumber());
+		Integer acctNum = request.getAccountNumber();
+		if(acctNum == null) {
+			throw new BadRequestException("Account number must be provided");
+		}
 		
-		// TODO this is a dummy for now. Need to handle exception if no account is returned.
-		return foundAccount.get();
+		Optional<Account> result = accountRepository.findByAccountNumber(acctNum);
+		
+		if(result.isEmpty()) {
+			throw new NotFoundException(acctNum.toString());
+		}
+		return result.get();
 		
 		
 	}
@@ -162,7 +169,7 @@ public class JpaResource {
 	}
 	
 	
-	// TODO get transactions by card and date range. Handle empty dates as wanting all.
+	//Get transactions by card and date range. Handle empty dates as wanting all.
 	//Method POST /transactions/card
 	//Inputs: Card Number
 	//Outputs: List of transactions corresponding to the card.
@@ -203,16 +210,49 @@ public class JpaResource {
 		
 		return results.get();
 		
-		
-		
-		
-		
-		
+
 	}
 	
-	// TODO get transactions by account. Handle empty dates as wanting all.
+	//Get transactions by account. Handle empty dates as wanting all.
 	//Method POST /transactions/account
 	//Inputs: Card Number, Start date, End date
 	//Outputs: List of transactions within the range, for all cards and accounts
-	
+	public List<Transaction> getTransactionsByAccount(@RequestBody TransactionLookupRequest request){
+		Integer accountNum = request.getAccountNum();
+		OffsetDateTime beginTime = request.getBeginTimestamp();
+		OffsetDateTime endTime = request.getEndTimestamp();
+		Optional<List<Transaction>> results;
+		
+		
+		//Check Inputs
+		if(accountNum == null) {
+			throw new BadRequestException("Card number must be provided.");
+		}
+		if(beginTime == null && endTime != null || beginTime != null && endTime == null) {
+			throw new BadRequestException("Both timestamps must be provided.");
+		}
+		if(beginTime.isAfter(endTime)) {
+			throw new BadRequestException("Begin timestamp must be before End timestamp.");
+		}
+		if(beginTime.equals(endTime)) {
+			endTime = endTime.plusDays(1L);
+		}
+		
+		//Query for the data.
+		
+		if(beginTime == null && endTime == null) {
+			results = transactionRepository.findByAccountId(accountNum);
+		}
+		else {
+			results = transactionRepository.findByAccountAndTimeBetween(accountNum, beginTime, endTime);
+		}
+		
+		if(results.isEmpty()) {
+			throw new NotFoundException(accountNum.toString());
+		}
+		
+		return results.get();
+		
+
+	}
 }

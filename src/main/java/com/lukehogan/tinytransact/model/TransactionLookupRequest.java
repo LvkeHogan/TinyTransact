@@ -26,7 +26,7 @@ public class TransactionLookupRequest {
 		return cardNum;
 	}
 	public TransactionLookupRequest(OffsetDateTime beginDate, OffsetDateTime endDate, Integer accountNum,
-			Integer cardNum) {
+			Long cardNum) {
 		super();
 		this.beginTimestamp = beginDate;
 		this.endTimestamp = endDate;
