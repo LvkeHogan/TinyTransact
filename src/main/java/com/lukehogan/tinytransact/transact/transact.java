@@ -1,6 +1,7 @@
 package com.lukehogan.tinytransact.transact;
 
-import java.util.random.*;
+import java.util.Random;
+import java.lang.Math;
 
 //Class to establish the basic methods needed for the system
 public class transact {
@@ -135,36 +136,20 @@ public class transact {
         return dummy;
     }
 
-    //method to withdrawl funds from a bank account
-    public static String withdraw(float amount, int accountNum){
-        String dummy = "incomplete";
-        // TODO check if account exists
-
-        // TODO complete the transaction and return result.
-
-        return dummy;
-    }
     
-    //method to create a bank account
-    public static String createAcct(String firstName, String lastName, float deposit){
-        String result = "invalid";
-        // TODO issue an 11 digit account number
+    //method to generate a bank account number (9 digits)
+    public static int generateAcctNum(){
+    	double number = 0;
+    	Random rand = new Random();
+    	for(int i = 0; i < 9; i ++) {
+    		int newDigit = rand.nextInt(10);
+    		number = number + newDigit * Math.pow((double)10,(double)i);
+    		
+    	}
 
-        // TODO add the account info into the database
-
-        return result;
+        return (int) number;
     }
 
-    public static float addCard(long accountNum, String type){
-        float dummy = 9999999999999999L;
-        // TODO ensure account exists. If it doesn't, return an error.
-
-        // TODO generate a card number of the specified type
-
-        // TODO add to database, link to the account.
-
-        return dummy;
-    }
 
 
 

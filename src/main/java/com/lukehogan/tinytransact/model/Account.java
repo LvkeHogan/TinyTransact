@@ -43,6 +43,14 @@ public class Account {
         this.balance = balance;
         this.cards = cards;
     }
+    
+    //Constructor for account creation
+    public Account(String firstName, String lastName, int accountNumber) {
+    	this.firstName = firstName;
+    	this.lastName = lastName;
+    	this.accountNumber = accountNumber;
+    	this.balance = 0.00;
+    }
 
     //getters
     public String getFirstName() {
@@ -82,7 +90,6 @@ public class Account {
 		return cards;
 	}
 	
-	// TODO this method needs improved. Need to decide if we're going to manage the card list here or outside.
 	public void setCards(List<Card> cards) {
 		this.cards = cards;
 	}

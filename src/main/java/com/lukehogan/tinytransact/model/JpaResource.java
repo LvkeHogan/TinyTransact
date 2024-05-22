@@ -15,6 +15,7 @@ import com.lukehogan.tinytransact.exception.NotFoundException;
 import com.lukehogan.tinytransact.jpa.AccountRepository;
 import com.lukehogan.tinytransact.jpa.CardRepository;
 import com.lukehogan.tinytransact.jpa.TransactionRepository;
+import com.lukehogan.tinytransact.transact.transact;
 
 @RestController
 public class JpaResource {
@@ -67,10 +68,37 @@ public class JpaResource {
 	}
 	
 	
-	// TODO Create new account
+	// Create new account
 	// Method POST /accounts/create
-	// Inputs: name, address, phone number, initial deposit, etc.
+	// Inputs: name, address, phone number, initial deposit, etc. in a class designed to take the input
 	// Outputs: Newly Issued Account Number
+	public int createAccount(@RequestBody AccountRequest request) {
+		//ensure required inputs are provided
+		if(request.getFirstName() == null || request.getLastName() == null) {
+			throw new BadRequestException("First and Last names must be provided.");
+		}
+		int newAcctNum = 0;
+		
+		//Generate an account number
+		boolean unique = false;
+		while(unique == false) {
+			newAcctNum = transact.generateAcctNum();
+			Optional<Account> test = accountRepository.findByAccountNumber(newAcctNum);
+			if(test.isEmpty()) {
+				unique = true;
+			}
+		}
+				
+		//Create a new account object with all the new info
+		Account NewAccount = new Account(request.getFirstName(), request.getLastName(), newAcctNum);
+		
+		//Persist it to the database
+		accountRepository.save(NewAccount);
+		
+		//return the account number
+		return newAcctNum;
+		
+	}
 	
 	
 	// TODO Close existing account
@@ -82,7 +110,7 @@ public class JpaResource {
 	//**Cards**
 	// TODO Issue new card
 	// Method POST /card
-	// Inputs: Account Number, Desired Type (amex, mastercard etc)
+	// Inputs: Account Number, Desired Type (amex, mastercard etc). Create unique class to handle.
 	// Outputs: Newly Issued Card Number
 	
 	
@@ -124,8 +152,14 @@ public class JpaResource {
 	// Outputs: charge amount or insufficient funds
 	
 	
-	// TODO get all transactions
-	////Method GET /transactions
+	//Get all transactions
+	//Method GET /transactions
+	//Inputs: None
+	//Outputs: All Transactions
+	@GetMapping("/transactions")
+	public List<Transaction> getAllTransactions(){
+		return transactionRepository.findAll();
+	}
 	
 	//Get transactions by date range
 	//Method POST /transactions/date
