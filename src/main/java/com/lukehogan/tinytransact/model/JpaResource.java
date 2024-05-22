@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -132,46 +133,78 @@ public class JpaResource {
 	// Method PATCH /accounts/update
 	// Inputs: (Mandatory)account number (Optional) first name, last name, address, city, state, phone number
 	// Outputs: none
+	@PatchMapping("/accounts/update")
+	public void modifyAccount(@RequestBody AccountRequest request) {
+		//Validate required input
+		if(request.getAccountNumber() == null) {
+			throw new BadRequestException("Account number must be provided");
+		}
+		
+		//See if account exists. If it doesn't, throw an exception
+		Optional<Account> foundAccount = accountRepository.findByAccountNumber(request.getAccountNumber());
+		if(foundAccount.isEmpty()) {
+			throw new NotFoundException(request.getAccountNumber().toString() + " Does Not Exist.");
+		}
+		Account account = foundAccount.get();
+		
+		//For all the not null provided fields in request, update the corresponding field in the target account.
+		if(request.getAddress() != null) {
+			account.setAddress(request.getAddress());
+		}
+		if(request.getCity() != null) {
+			account.setCity(request.getCity());
+		}
+		if(request.getState() != null) {
+			account.setState(request.getState());
+		}
+		if(request.getZipCode() != null) {
+			account.setZipCode(request.getZipCode());
+		}
+		if(request.getPhoneNum() != null) {
+			account.setPhoneNum(request.getPhoneNum());
+		}
+		
+	}
 	
 	
 	//**Transaction Execution Methods**
 	
-	// Credit Card Charge
+	// TODO Credit Card Charge
 	// Method POST /card/charge
 	// Inputs: Card number, charge amount
 	// Outputs: Card Type, charge amount
 	
 	
 	
-	// Credit Card Refund
+	// TODO Credit Card Refund
 	// Method POST /card/refund
 	// Inputs: Card number, refund amount
 	// Outputs: Card Type, refund amount
 	
 	
 	
-	// Account Deposit
+	// TODO Account Deposit
 	// Method POST /accounts/deposit
 	// Inputs: Account number, deposit amount
 	// Outputs: Account holder name, deposit amount, balance after deposit
 	
 	
 	
-	// Account Withdraw
+	// TODO Account Withdraw
 	// Method POST /accounts/withdraw
 	// Inputs: Account number, withdraw amount
 	// Outputs: Account holder name, withdraw amount, balance after withdraw
 	
 	
 	
-	// Account Transfer
+	// TODO Account Transfer
 	// Method POST /accounts/transfer
 	// Inputs: Account from, Account to, Transfer amount
 	// Outputs: from account holder name, to account holder name, transfer amount
 	
 	
 	
-	// Account Balance Check
+	// TODO Account Balance Check
 	// Method POST /accounts/balance
 	// Inputs: Account number
 	// Outputs: Account holder name, current balance

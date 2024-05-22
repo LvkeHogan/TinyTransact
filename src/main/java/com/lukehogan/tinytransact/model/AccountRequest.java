@@ -22,6 +22,21 @@ public class AccountRequest {
 	public String getLastName() {
 		return lastName;
 	}
+	public String getAddress() {
+		return address;
+	}
+	public String getCity() {
+		return city;
+	}
+	public String getState() {
+		return state;
+	}
+	public Integer getZipCode() {
+		return zipCode;
+	}
+	public Long getPhoneNum() {
+		return phoneNum;
+	}
 	
 	//Constructor for simple lookup operations
 	public AccountRequest(Integer accountNumber, String firstName, String lastName) {
