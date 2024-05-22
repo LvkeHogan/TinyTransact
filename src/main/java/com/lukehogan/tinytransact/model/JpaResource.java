@@ -167,6 +167,7 @@ public class JpaResource {
 	}
 	
 	
+	
 	//**Transaction Execution Methods**
 	
 	// TODO Credit Card Charge
@@ -210,12 +211,9 @@ public class JpaResource {
 	// Outputs: Account holder name, current balance
 	
 	
-	//**Transaction Lookup Methods**
 	
-	// TODO Close existing account
-	// Method POST /accounts/close
-	// Inputs: account number
-	// Outputs: returned funds
+	
+
 	
 	
 	//**Cards**
@@ -238,7 +236,10 @@ public class JpaResource {
 	
 	
 	
+	
 	//**Transactions**
+	
+	
 	// TODO Account deposit
 	// Method PATCH /accounts/deposit
 	// Inputs: Account Number, deposit amount (has to be 2 decimal places)
@@ -261,6 +262,11 @@ public class JpaResource {
 	// Method PATCH /card/refund
 	// Inputs: Credit card number, refund amount (has to be 2 decimal places)
 	// Outputs: charge amount or insufficient funds
+	
+	
+	
+	
+	//**Transaction Lookup Methods**
 	
 	
 	//Get all transactions

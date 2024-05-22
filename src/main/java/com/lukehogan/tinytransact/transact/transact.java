@@ -1,28 +1,16 @@
 package com.lukehogan.tinytransact.transact;
 
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
-import java.lang.Math;
 
 //Class to establish the basic methods needed for the system
 public class transact {
 
-    public static String cardCheck(long cardNum) {
-        String type = "";
-        String checkResult =  "";
-        boolean luhnCheck;
 
-        //Check if the card is a valid card (do Luhn checksum check)
-        luhnCheck = checksum(cardNum);
-        //determine card type
-        type = cardType(cardNum);
-        // TODO Determine if the card exists in the DB
-
-        // TODO return string containing card type, or "invalid" tag with explanation
-        return checkResult;
-    }
-
-    //Function that tests card validity using Luhn's Algorithm. If checksum is correct, card is valid.
-    public static Boolean checksum(long cardNum){
+    //Method that tests card validity using Luhn's Algorithm. If checksum is correct, card is valid.
+    public static Boolean luhnCheck(long cardNum){
         boolean valid = false;
         String cardString = Long.toString(cardNum);
         int sum = 0;
@@ -61,81 +49,91 @@ public class transact {
 
         return valid;
     }
-
-    //Method to determine whether a card is Visa, Mastercard, Discover, American Express or Invalid
+    
+    
+    //Method for validating a given card
     public static String cardType(long cardNum){
         //get length of card number
         String cardStr = Long.toString(cardNum);
         int inputLength = cardStr.length();
         String cardType = "INVALID";
         switch (inputLength) {
-            case 13:
-                //if the first digit of a 13 digit card is 4, it's a Visa.
-                if(Character.getNumericValue(cardStr.charAt(0)) == 4){
-                    cardType = "VISA";
-                }
-            case 15:
-                //if a 15 digit card begins with 34 or 37, it's an American Express
+        	case 14:
+        		//if a 14 digit card begins with 7, it's a funcard.
+        		int cardBeginning14 = Character.getNumericValue(cardStr.charAt(0));
+        		if(cardBeginning14 == 7 && luhnCheck(cardNum)) {
+        			cardType = "FunCard";
+        		}
+        	case 15:
+                //if a 15 digit card begins with 68, it's a PoshCard
                 int cardBeginning15 = Integer.parseInt(cardStr.substring(0,1));
-                if( cardBeginning15 == 34 || cardBeginning15 == 37){
-                    cardType = "AMEX";
+                if( cardBeginning15 == 68 && luhnCheck(cardNum)){
+                    cardType = "PoshCard";
                 }
             case 16:
                 int cardBeginning16 = Integer.parseInt(cardStr.substring(0,1));
-                //If a 16 digit card begins with 51,52,53,54,55, it's a Mastercard.
-                if(cardBeginning16 == 51 || cardBeginning16 == 52 || cardBeginning16 == 53 || cardBeginning16 == 54 || cardBeginning16 == 55){
-                    cardType = "MASTERCARD";
+                //If a 16 digit card begins with 23, it's a ZapCard
+                if(cardBeginning16 == 23 && luhnCheck(cardNum)){
+                    cardType = "ZapCard";
                 }
-                //if a 16 digit card begins with 4, it's a Visa.
-                if(Character.getNumericValue(cardStr.charAt(0)) == 4){
-                    cardType = "VISA";
+                //if a 16 digit card begins with 8, it's a FusionCard.
+                if(Character.getNumericValue(cardStr.charAt(0)) == 8 && luhnCheck(cardNum)){
+                    cardType = "FusionCard";
             }
         }
         return cardType;
     }
-
     
-    //method to charge a bank account using an issued credit card
-    public static String debit(float amount, int cardNum){
-        String dummy = "incomplete";
-        // TODO run a card check. return error if DNE or not issued
-        String checkResult = cardCheck(cardNum);
-        if(checkResult == "invalid"){
-            return("invalid");
-        }
-        // TODO locate the associated bank account number from the card table
-
-        // TODO update funds to add the refund
-
-        // TODO return approved, denied, and card type, or indicate card is invalid or unissied
-
-        return dummy;
+    //method to generate a new card number that conforms to Luhn's algorithm (UNCHECKED)
+    public static long generateCardNum(String type) {
+    	List<Integer> newCard = new ArrayList<>();
+    	Random rand = new Random();
+    	if(type == "FusionCard") {
+    		//FusionCard is 16 digits, begins with 8.
+    		//set 8 as the first digit
+    		newCard.add(8);
+    		//generate the remaining 14 digits
+    		for(int i = 0; i < 14; i++) {
+    			newCard.add(rand.nextInt());
+    		}
+    		
+    		//calculate and add the check digit to satisfy Luhn's algorithm (break logic into another private static method)
+    		//https://en.wikipedia.org/wiki/Luhn_algorithm
+    		newCard.add(generateCheckDigit(newCard));
+    		
+    		// TODO get the list into a long. A
+    		
+    	}
+    	
     }
-
-    //method to refund a bank account using an issued credit card
-    public static String refund(float amount, int cardNum){
-        String dummy = "incomplete";
-        // TODO run a card check. return error if DNE or not issued
-        
-        // TODO locate the associated bank account number from the card table
-
-        // TODO update funds to add the refund
-        
-        // TODO return approved, denied, and card type, or indicate card is invalid or unissied
-
-        return dummy;
+    
+    //Code to calculate check digit given an arraylist. (UNCHECKED)
+    private static int generateCheckDigit(ArrayList input) {
+    	//Work from rightmost digit, doubling every other digit.
+    	//imports are messed up, so for now we'll pseudocode this
+    	int prodHolder = 0;
+    	int prodLength = 0;
+    	int sum = 0;
+    	listSize = input.size();
+    	//start from right, double every other, sum the digits of the resulting products.
+    	for(int i = listSize - 1; i >= 0; i -= 2) {
+    		prodHolder = input.get(i) * 2;
+    		prodLength = Integer.toString(prodHolder).length();
+    		if(prodLength > 1) {
+    			for(int j = 0; j < prodLength; j++){
+                    sum += Character.getNumericValue(Integer.toString(prodHolder).charAt(prodLength-1-j));
+                }
+    		}	
+    	}
+    	//Sum the other digits
+    	for(int i = listSize - 2; i >= 0; i -= 2) {
+    		sum += input.get(i);
+    	}
+    	//Calculate the check digit using the calculated sum
+    	int checkDigit = 10 - (sum % 10);
+    	
+    	return checkDigit;
     }
-
-    //method to deposit funds into a bank account
-    public static String deposit(float amount, int accountNum){
-        String dummy = "incomplete";
-        // TODO check if account exists
-
-        // TODO complete the transaction and return result.
-
-        return dummy;
-    }
-
     
     //method to generate a bank account number (9 digits)
     public static int generateAcctNum(){
