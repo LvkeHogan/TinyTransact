@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -72,10 +73,11 @@ public class JpaResource {
 	// Method POST /accounts/create
 	// Inputs: name, address, phone number, initial deposit, etc. in a class designed to take the input
 	// Outputs: Newly Issued Account Number
-	public int createAccount(@RequestBody AccountRequest request) {
+	@PostMapping("/accounts/create")
+	public int createAccount(@RequestBody Account newAccount) {
 		//ensure required inputs are provided
-		if(request.getFirstName() == null || request.getLastName() == null) {
-			throw new BadRequestException("First and Last names must be provided.");
+		if(newAccount.getFirstName() == null || newAccount.getLastName() == null || newAccount.getAddress() == null || newAccount.getCity() == null || newAccount.getState() == null || newAccount.getZipCode() == null || newAccount.getPhoneNum() == null) {
+			throw new BadRequestException("First name, Last Name, Address components and Phone Number must be provided.");
 		}
 		int newAcctNum = 0;
 		
@@ -89,17 +91,93 @@ public class JpaResource {
 			}
 		}
 				
-		//Create a new account object with all the new info
-		Account NewAccount = new Account(request.getFirstName(), request.getLastName(), newAcctNum);
+		//Update new account with its account number
+		newAccount.setAccountNumber(newAcctNum);
 		
 		//Persist it to the database
-		accountRepository.save(NewAccount);
+		accountRepository.save(newAccount);
 		
 		//return the account number
 		return newAcctNum;
 		
 	}
 	
+	// Delete an account
+	// Method DELETE /accounts/
+	// Inputs: first name, last name, account number
+	// Outputs: deleted account balance (cashout)
+	@DeleteMapping("/accounts")
+	public double deleteAccount(@RequestBody AccountRequest request) {
+		//Check inputs not null
+		if(request.getFirstName() == null || request.getLastName() == null || request.getAccountNumber() == null) {
+			throw new BadRequestException("Account number, First name and Last name must be provided.");
+		}
+		//see if account exists. if it doesn't, throw an exception.
+		Optional<Account> foundAccount = accountRepository.findByAccountNumber(request.getAccountNumber());
+		if(foundAccount.isEmpty()) {
+			throw new NotFoundException(request.getAccountNumber().toString() + " Does Not Exist.");
+		}
+		//Save the account balance to return
+		double balance = foundAccount.get().getBalance();
+		
+		//Delete the account
+		accountRepository.delete(foundAccount.get());
+		
+		return balance;
+		
+	}
+	
+	
+	// Modify an existing account
+	// Method PATCH /accounts/update
+	// Inputs: (Mandatory)account number (Optional) first name, last name, address, city, state, phone number
+	// Outputs: none
+	
+	
+	//**Transaction Execution Methods**
+	
+	// Credit Card Charge
+	// Method POST /card/charge
+	// Inputs: Card number, charge amount
+	// Outputs: Card Type, charge amount
+	
+	
+	
+	// Credit Card Refund
+	// Method POST /card/refund
+	// Inputs: Card number, refund amount
+	// Outputs: Card Type, refund amount
+	
+	
+	
+	// Account Deposit
+	// Method POST /accounts/deposit
+	// Inputs: Account number, deposit amount
+	// Outputs: Account holder name, deposit amount, balance after deposit
+	
+	
+	
+	// Account Withdraw
+	// Method POST /accounts/withdraw
+	// Inputs: Account number, withdraw amount
+	// Outputs: Account holder name, withdraw amount, balance after withdraw
+	
+	
+	
+	// Account Transfer
+	// Method POST /accounts/transfer
+	// Inputs: Account from, Account to, Transfer amount
+	// Outputs: from account holder name, to account holder name, transfer amount
+	
+	
+	
+	// Account Balance Check
+	// Method POST /accounts/balance
+	// Inputs: Account number
+	// Outputs: Account holder name, current balance
+	
+	
+	//**Transaction Lookup Methods**
 	
 	// TODO Close existing account
 	// Method POST /accounts/close
