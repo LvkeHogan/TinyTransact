@@ -10,8 +10,8 @@ public class transact {
 
 
     //Method that tests card validity using Luhn's Algorithm. If checksum is correct, card is valid.
-    public static Boolean luhnCheck(long cardNum){
-        Boolean valid = False;
+    public static boolean luhnCheck(long cardNum){
+        boolean valid = false;
         String cardString = Long.toString(cardNum);
         int sum = 0;
         int prodLength = 0;
@@ -44,7 +44,7 @@ public class transact {
         //if last digit of sum is 0, the card number is valid.
         int sumLength = Integer.toString(sum).length();
         if(Character.getNumericValue(Integer.toString(sum).charAt(sumLength - 1)) == 0){
-            valid = True;
+            valid = true;
         }
 
         return valid;
@@ -95,7 +95,7 @@ public class transact {
                 newCard.add(8);
                 //generate the remaining 14 digits
                 for (int i = 0; i < 14; i++) {
-                    newCard.add(rand.nextInteger());
+                    newCard.add(rand.nextInt(10));
                 }
             }
             case "ZapCard" -> {
@@ -105,7 +105,7 @@ public class transact {
                 newCard.add(3);
                 //generate the remaining 13 digits
                 for (int i = 0; i < 13; i++) {
-                    newCard.add(rand.nextInteger());
+                    newCard.add(rand.nextInt(10));
                 }
             }
             case "PoshCard" -> {
@@ -115,7 +115,7 @@ public class transact {
                 newCard.add(8);
                 //generate the remaining 12 digits
                 for (int i = 0; i < 12; i++) {
-                    newCard.add(rand.nextInteger());
+                    newCard.add(rand.nextInt(10));
                 }
             }
             case "FunCard" -> {
@@ -124,7 +124,7 @@ public class transact {
                 newCard.add(7);
                 //generate the remaining 12 digits
                 for (int i = 0; i < 12; i++) {
-                    newCard.add(rand.nextInteger());
+                    newCard.add(rand.nextInt(10));
                 }
             }
             default -> {
@@ -132,24 +132,28 @@ public class transact {
             }
         }
     		
-    		//calculate and add the check digit to satisfy Luhn's algorithm (break logic into another private static method)
-    		//https://en.wikipedia.org/wiki/Luhn_algorithm
-    		newCard.add(generateCheckDigit(newCard));
-    		
-    		// TODO Convert list elements into a long.
-    		
+        //calculate and add the check digit to satisfy Luhn's algorithm (break logic into another private static method)
+        //https://en.wikipedia.org/wiki/Luhn_algorithm
+        newCard.add(generateCheckDigit(newCard));
+
+        // TODO Convert list elements into a long.
+        StringBuilder cardNumberString = new StringBuilder();
+        for(Integer digit: newCard){
+            cardNumberString.append(digit);
     	}
+
+        return Long.parseLong(cardNumberString.toString());
     	
     }
     
     //Code to calculate check digit given an arraylist. (UNCHECKED)
-    private static int generateCheckDigit(ArrayList input) {
+    private static int generateCheckDigit(List<Integer> input) {
     	//Work from rightmost digit, doubling every other digit.
     	//imports are messed up, so for now we'll pseudocode this
     	int prodHolder = 0;
     	int prodLength = 0;
     	int sum = 0;
-    	listSize = input.size();
+    	int listSize = input.size();
     	//start from right, double every other, sum the digits of the resulting products.
     	for(int i = listSize - 1; i >= 0; i -= 2) {
     		prodHolder = input.get(i) * 2;
