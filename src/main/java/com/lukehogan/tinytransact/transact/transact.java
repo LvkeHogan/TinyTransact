@@ -49,7 +49,7 @@ public class transact {
     
     
     //Method for validating a given card (VERIFIED)
-    public static String cardType(long cardNum){
+    public static String cardValidator(long cardNum){
         //get length of card number
         String cardStr = Long.toString(cardNum);
         int inputLength = cardStr.length();

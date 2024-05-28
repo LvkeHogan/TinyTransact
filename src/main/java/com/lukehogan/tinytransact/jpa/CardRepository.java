@@ -15,6 +15,9 @@ public interface CardRepository extends JpaRepository<Card, Integer> {
 	
 	//Find card by card number
 	Optional<Card> findByCardNum(long cardNum);
+
+	//Delete card by card number
+	Optional<Card> deleteByCardNum(long cardNum);
 	
 	
 	

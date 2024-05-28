@@ -1,23 +1,19 @@
 package com.lukehogan.tinytransact.model;
 
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.lukehogan.tinytransact.exception.BadRequestException;
 import com.lukehogan.tinytransact.exception.NotFoundException;
 import com.lukehogan.tinytransact.jpa.AccountRepository;
 import com.lukehogan.tinytransact.jpa.CardRepository;
 import com.lukehogan.tinytransact.jpa.TransactionRepository;
 import com.lukehogan.tinytransact.transact.transact;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class JpaResource {
@@ -120,6 +116,8 @@ public class JpaResource {
 		}
 		//Save the account balance to return
 		double balance = foundAccount.get().getBalance();
+
+		// TODO delete all cards linked to the account. Just use the method we'll make for deleting cards.
 		
 		//Delete the account
 		accountRepository.delete(foundAccount.get());
@@ -217,22 +215,93 @@ public class JpaResource {
 	
 	
 	//**Cards**
-	// TODO Issue new card
+	// Issue new card
 	// Method POST /card
-	// Inputs: Account Number, Desired Type (amex, mastercard etc). Create unique class to handle.
+	// Inputs: Account Number, Desired Type (Fusion, Zap, Posh or Fun). Create unique class to handle.
 	// Outputs: Newly Issued Card Number
+	@PostMapping("/card")
+	public long issueCard(@RequestBody CardRequest request){
+		ArrayList<String> cardTypes = new ArrayList<String>(Arrays.asList("FusionCard","ZapCard","PoshCard","FunCard"));
+
+		String type = request.getType();
+		Integer accountNumber = request.getAccountNumber();
+
+		//Validate inputs
+		if(type == null || accountNumber == null){
+			throw new BadRequestException("Account Number and Card Type must be supplied.");
+		}
+		if(!cardTypes.contains(type)){
+			throw new BadRequestException("Available card types: FusionCard, ZapCard, PoshCard, FunCard");
+		}
+		Optional<Account> foundAccount = accountRepository.findByAccountNumber(accountNumber);
+		if(foundAccount.isEmpty()){
+			throw new NotFoundException("Account does not exist");
+		}
+
+		//Create the new unique card number
+		long newCardNumber = 0L;
+		do{
+			newCardNumber = transact.generateCardNum(type);
+		}
+		while(cardRepository.findByCardNum(newCardNumber).isPresent());
+
+		//Generate the new card object
+		Card newCard = new Card(foundAccount.get(),type,newCardNumber);
+
+		//Save to Database
+		cardRepository.save(newCard);
+		return newCardNumber;
+	}
 	
 	
 	// TODO Close existing card
 	// Method POST /card/issue
 	// Inputs: Card number
 	// Outputs: None
+	@DeleteMapping("/card")
+	public void closeCard(@RequestBody CardRequest request){
+		//Validate Inputs
+		Long cardNumber = request.getCardNumber();
+		if(cardNumber == null){
+			throw new BadRequestException("Card number must be provided");
+		}
+		if(cardRepository.findByCardNum(cardNumber).isEmpty()){
+			throw new NotFoundException("Card does not exist");
+		}
+		//Perform the close operation
+		cardRepository.deleteByCardNum(cardNumber);
+	}
 	
 	
-	// TODO Reissue existing card
+	// Reissue existing card
 	// Method POST /card/issue
 	// Inputs: Current card number
 	// Outputs: Updated card number
+	@PatchMapping("/card/reissue")
+	public long reissueCard(@RequestBody CardRequest request){
+		Long cardNumber = request.getCardNumber();
+		//validate inputs
+		if(cardNumber.describeConstable().isEmpty()){
+			throw new BadRequestException("Card number must be provided.");
+		}
+
+		Optional<Card> foundCard = cardRepository.findByCardNum(cardNumber);
+		if(foundCard.isEmpty()){
+			throw new NotFoundException("Card not found");
+		}
+
+		Card currentCard = foundCard.get();
+		long newCardNum;
+		do {
+			newCardNum = transact.generateCardNum(currentCard.getType());
+		}
+		//Look into exists spring data jpa method. Might clean up lots of our code.
+		while(!cardRepository.findByCardNum(newCardNum).isEmpty());
+
+		currentCard.setCardNum(newCardNum);
+		return newCardNum;
+
+	}
 	
 	
 	

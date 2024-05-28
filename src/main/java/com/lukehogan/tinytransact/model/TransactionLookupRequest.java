@@ -34,13 +34,4 @@ public class TransactionLookupRequest {
 		this.cardNum = cardNum;
 	}
 	
-	
-	//Constructor to handle date range and account request
-	
-
-	
-
-	
-	
-	
 }

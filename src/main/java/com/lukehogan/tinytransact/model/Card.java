@@ -36,8 +36,7 @@ public class Card {
     }
 
     //auxiliary constructor
-    public Card(int cardID, Account account, String type, long cardNum){
-        this.id = cardID;
+    public Card(Account account, String type, long cardNum){
         this.account = account;
         this.type = type;
         this.cardNum = cardNum;
@@ -57,5 +56,7 @@ public class Card {
 		return account;
 	}
 
-
+    public void setCardNum(long cardNum) {
+        this.cardNum = cardNum;
+    }
 }
