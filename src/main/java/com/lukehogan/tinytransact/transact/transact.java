@@ -11,7 +11,7 @@ public class transact {
 
     //Method that tests card validity using Luhn's Algorithm. If checksum is correct, card is valid.
     public static Boolean luhnCheck(long cardNum){
-        boolean valid = false;
+        Boolean valid = False;
         String cardString = Long.toString(cardNum);
         int sum = 0;
         int prodLength = 0;
@@ -44,7 +44,7 @@ public class transact {
         //if last digit of sum is 0, the card number is valid.
         int sumLength = Integer.toString(sum).length();
         if(Character.getNumericValue(Integer.toString(sum).charAt(sumLength - 1)) == 0){
-            valid = true;
+            valid = True;
         }
 
         return valid;
@@ -88,20 +88,55 @@ public class transact {
     public static long generateCardNum(String type) {
     	List<Integer> newCard = new ArrayList<>();
     	Random rand = new Random();
-    	if(type == "FusionCard") {
-    		//FusionCard is 16 digits, begins with 8.
-    		//set 8 as the first digit
-    		newCard.add(8);
-    		//generate the remaining 14 digits
-    		for(int i = 0; i < 14; i++) {
-    			newCard.add(rand.nextInt());
-    		}
+        switch (type) {
+            case "FusionCard" -> {
+                //FusionCard is 16 digits, begins with 8.
+                //set 8 as the first digit
+                newCard.add(8);
+                //generate the remaining 14 digits
+                for (int i = 0; i < 14; i++) {
+                    newCard.add(rand.nextInteger());
+                }
+            }
+            case "ZapCard" -> {
+                //ZapCard is 16 digits, begins with 23.
+                //Set first digits
+                newCard.add(2);
+                newCard.add(3);
+                //generate the remaining 13 digits
+                for (int i = 0; i < 13; i++) {
+                    newCard.add(rand.nextInteger());
+                }
+            }
+            case "PoshCard" -> {
+                //PoshCard is 15 digits, begins with 68.
+                //Set first digits
+                newCard.add(6);
+                newCard.add(8);
+                //generate the remaining 12 digits
+                for (int i = 0; i < 12; i++) {
+                    newCard.add(rand.nextInteger());
+                }
+            }
+            case "FunCard" -> {
+                //FunCard is 14 digits, begins with 7.
+                //Set first digits
+                newCard.add(7);
+                //generate the remaining 12 digits
+                for (int i = 0; i < 12; i++) {
+                    newCard.add(rand.nextInteger());
+                }
+            }
+            default -> {
+                return 0;
+            }
+        }
     		
     		//calculate and add the check digit to satisfy Luhn's algorithm (break logic into another private static method)
     		//https://en.wikipedia.org/wiki/Luhn_algorithm
     		newCard.add(generateCheckDigit(newCard));
     		
-    		// TODO get the list into a long. A
+    		// TODO Convert list elements into a long.
     		
     	}
     	
@@ -135,7 +170,7 @@ public class transact {
     	return checkDigit;
     }
     
-    //method to generate a bank account number (9 digits)
+    //method to generate a bank account number (9 digits) (UNCHECKED)
     public static int generateAcctNum(){
     	double number = 0;
     	Random rand = new Random();
