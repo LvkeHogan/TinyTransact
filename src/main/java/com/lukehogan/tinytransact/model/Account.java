@@ -1,5 +1,6 @@
 package com.lukehogan.tinytransact.model;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import jakarta.persistence.Entity;
@@ -39,7 +40,7 @@ public class Account {
     @OneToMany(mappedBy = "account")
     private List<Transaction> transactions;
     
-    private double balance;
+    private BigDecimal balance;
 
     //empty constructor for Hibernate/JPA
     public Account() {
@@ -50,7 +51,7 @@ public class Account {
     public Account(String firstName, String lastName, double balance, List<Card> cards) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.balance = balance;
+        this.balance = BigDecimal.valueOf(balance);
         this.cards = cards;
     }
     
@@ -64,7 +65,7 @@ public class Account {
     	this.zipCode = zipCode;
     	this.phoneNum = phoneNum;
     	this.accountNumber = accountNumber;
-    	this.balance = 0.00;
+    	this.balance = new BigDecimal("0.00");
     }
 
     //getters
@@ -84,7 +85,7 @@ public class Account {
 		return accountNumber;
 	}
 
-	public double getBalance() {
+	public BigDecimal getBalance() {
         return balance;
     }
 
@@ -97,7 +98,7 @@ public class Account {
         this.lastName = newLastName;
     }
 
-    public void setBalance(double newBalance) {
+    public void setBalance(BigDecimal newBalance) {
         this.balance = newBalance;
     }
 

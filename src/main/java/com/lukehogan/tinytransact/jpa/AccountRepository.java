@@ -12,4 +12,7 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
 	//Custom method to get account by number.
 	Optional<Account> findByAccountNumber(int accountNumber);
 
+	//Method to see if an account exists.
+	boolean existsByAccountNumber(int accountNumber);
+
 }

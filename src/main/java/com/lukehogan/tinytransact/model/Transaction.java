@@ -1,5 +1,6 @@
 package com.lukehogan.tinytransact.model;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 import jakarta.persistence.Entity;
@@ -22,7 +23,7 @@ public class Transaction {
     @JoinColumn(name = "accountId", nullable = true)
     private Account account;
 
-    private double amount;
+    private BigDecimal amount;
     
     @ManyToOne
     @JoinColumn(name = "cardId", nullable = true)
@@ -39,7 +40,7 @@ public class Transaction {
     }
 
     //Constructor to allow bank deposit/withdraw
-    public Transaction(Account account, double amount, OffsetDateTime time){
+    public Transaction(Account account, BigDecimal amount, OffsetDateTime time){
         this.account = account;
         this.amount = amount;
         this.time = time;
@@ -47,19 +48,27 @@ public class Transaction {
     
     
     //Constructor to allow card transactions
-    public Transaction(Card card, double amount, OffsetDateTime time){
+    public Transaction(Card card, BigDecimal amount, OffsetDateTime time){
         this.card = card;
         this.amount = amount;
         this.time = time;
     }
     
     //getters
-    public double getAmount(){
+    public BigDecimal getAmount(){
         return amount;
     }
 
     public OffsetDateTime getTime(){
         return time;
+    }
+
+    public Account getAccount() {
+        return account;
+    }
+
+    public Card getCard() {
+        return card;
     }
 
     //No setters defined; after a transaction is made, these values can't be changed.

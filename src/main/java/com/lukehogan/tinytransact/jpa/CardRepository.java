@@ -18,6 +18,9 @@ public interface CardRepository extends JpaRepository<Card, Integer> {
 
 	//Delete card by card number
 	Optional<Card> deleteByCardNum(long cardNum);
+
+	//See if a card exists
+	boolean existsByCardNum(long cardNum);
 	
 	
 	

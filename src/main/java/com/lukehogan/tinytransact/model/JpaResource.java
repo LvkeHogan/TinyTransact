@@ -9,6 +9,8 @@ import com.lukehogan.tinytransact.transact.transact;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -115,14 +117,14 @@ public class JpaResource {
 			throw new NotFoundException(request.getAccountNumber().toString() + " Does Not Exist.");
 		}
 		//Save the account balance to return
-		double balance = foundAccount.get().getBalance();
+		BigDecimal balance = foundAccount.get().getBalance();
 
 		// TODO delete all cards linked to the account. Just use the method we'll make for deleting cards.
 		
 		//Delete the account
 		accountRepository.delete(foundAccount.get());
 		
-		return balance;
+		return balance.setScale(2, RoundingMode.CEILING).floatValue();
 		
 	}
 	
@@ -296,7 +298,7 @@ public class JpaResource {
 			newCardNum = transact.generateCardNum(currentCard.getType());
 		}
 		//Look into exists spring data jpa method. Might clean up lots of our code.
-		while(!cardRepository.findByCardNum(newCardNum).isEmpty());
+		while(cardRepository.findByCardNum(newCardNum).isPresent());
 
 		currentCard.setCardNum(newCardNum);
 		return newCardNum;
@@ -313,6 +315,27 @@ public class JpaResource {
 	// Method PATCH /accounts/deposit
 	// Inputs: Account Number, deposit amount (has to be 2 decimal places)
 	// Outputs: new balance
+	@PatchMapping("/accounts/deposit")
+	public double accountDeposit(@RequestBody AccountTransactionRequest request){
+		//Validate input
+		if(request.getAccountNum() == null || request.getAmount() == null){
+			throw new BadRequestException("All fields must be populated");
+		}
+		Integer accountNum = request.getAccountNum();
+		Optional<Account> foundAccount = accountRepository.findByAccountNumber(accountNum);
+		if(foundAccount.isEmpty()){
+			throw new NotFoundException("Account does not exist");
+		}
+		//Check that decimal is to 2 decimal places. If not, round. Input should always be 2 decimal places.
+		BigDecimal depositAmount = new BigDecimal(request.getAmount()).setScale(2,RoundingMode.FLOOR);
+
+		//Perform the addition operation to the account.
+		Account account = foundAccount.get();
+		BigDecimal newBalance = account.getBalance().add(depositAmount);
+		account.setBalance(newBalance);
+
+		return newBalance.doubleValue();
+	}
 	
 	
 	// TODO Account withdraw
