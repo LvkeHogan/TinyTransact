@@ -53,6 +53,14 @@ public class Transaction {
         this.amount = amount;
         this.time = time;
     }
+
+    //Constructor to allow storage of all parameters
+    public Transaction(Card card,Account account, BigDecimal amount, OffsetDateTime time){
+        this.card = card;
+        this.account = account;
+        this.amount = amount;
+        this.time = time;
+    }
     
     //getters
     public BigDecimal getAmount(){

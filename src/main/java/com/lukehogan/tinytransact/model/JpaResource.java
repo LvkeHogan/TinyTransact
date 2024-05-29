@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -329,12 +330,17 @@ public class JpaResource {
 		//Check that decimal is to 2 decimal places. If not, round. Input should always be 2 decimal places.
 		BigDecimal depositAmount = new BigDecimal(request.getAmount()).setScale(2,RoundingMode.FLOOR);
 
-		//Perform the addition operation to the account.
+		//Perform the deposit operation to the account.
 		Account account = foundAccount.get();
 		BigDecimal newBalance = account.getBalance().add(depositAmount);
 		account.setBalance(newBalance);
 
+		// TODO Create a transaction record for the deposit
+		Transaction record = new Transaction(account,depositAmount,OffsetDateTime.now());
+
+		// TODO send the updated account and transaction to the database
 		accountRepository.save(account);
+		transactionRepository.save(record);
 
 		return newBalance.doubleValue();
 	}
@@ -352,34 +358,107 @@ public class JpaResource {
 		}
 		Integer accountNum = request.getAccountNum();
 		Optional<Account> foundAccount = accountRepository.findByAccountNumber(accountNum);
+		BigDecimal withdrawAmount = new BigDecimal(request.getAmount()).setScale(2,RoundingMode.FLOOR);
 		if(foundAccount.isEmpty()){
 			throw new NotFoundException("Account does not exist");
 		}
-		//Check that decimal is to 2 decimal places. If not, round. Input should always be 2 decimal places.
-		BigDecimal withdrawAmount = new BigDecimal(request.getAmount()).setScale(2,RoundingMode.FLOOR);
+		if(foundAccount.get().getBalance().compareTo(withdrawAmount) <0){
+			throw new BadRequestException("Insufficient Funds");
+		}
+
 
 		//Perform the withdraw operation to the account.
 		Account account = foundAccount.get();
 		BigDecimal newBalance = account.getBalance().subtract(withdrawAmount);
 		account.setBalance(newBalance);
 
+		//create a transaction record for the withdraw.
+		Transaction record = new Transaction(account,withdrawAmount.multiply(BigDecimal.valueOf(-1)),OffsetDateTime.now());
+
+		//save the updated account and transaction to the database
 		accountRepository.save(account);
+		transactionRepository.save(record);
 
 		return newBalance.doubleValue();
 	}
 	
 	
-	// TODO Credit card charge
+	// Credit card charge
 	// Method PATCH /card/charge
 	// Inputs: Credit card number, charge amount (has to be 2 decimal places)
 	// Outputs: charge amount or insufficient funds
+	@PatchMapping("/card/charge")
+	public CardResult cardCharge(@RequestBody CardTransactionRequest request){
+		//Validate input
+		if(request.getCardNum() == null || request.getAmount() == null){
+			throw new BadRequestException("All fields must be populated");
+		}
+		Long cardNum = request.getCardNum();
+		Optional<Card> foundCard = cardRepository.findByCardNum(cardNum);
+		BigDecimal chargeAmount = new BigDecimal(request.getAmount()).setScale(2,RoundingMode.FLOOR);
+		if(foundCard.isEmpty()){
+			throw new NotFoundException("Card does not exist");
+		}
+		Card card = foundCard.get();
+		//Retrieve the account linked to the card.
+		Account linkedAccount = card.getAccount();
+		if(linkedAccount.getBalance().compareTo(chargeAmount) <0){
+			throw new BadRequestException("Insufficient Funds");
+		}
+
+
+		//Perform the charge operation to the account.
+		BigDecimal newBalance = linkedAccount.getBalance().subtract(chargeAmount);
+		linkedAccount.setBalance(newBalance);
+
+		//create a transaction record for the withdraw.
+		Transaction record = new Transaction(card,linkedAccount,chargeAmount.multiply(BigDecimal.valueOf(-1)),OffsetDateTime.now());
+
+		//save the updated account and transaction to the database
+		accountRepository.save(linkedAccount);
+		transactionRepository.save(record);
+
+		//return charge amount and card type
+		return new CardResult(card.getType(),chargeAmount.doubleValue());
+	}
+
 	
 	
-	// TODO Credit card refund
+	// Credit card refund
 	// Method PATCH /card/refund
 	// Inputs: Credit card number, refund amount (has to be 2 decimal places)
 	// Outputs: charge amount or insufficient funds
-	
+	@PatchMapping("/card/charge")
+	public CardResult cardRefund(@RequestBody CardTransactionRequest request){
+		//Validate input
+		if(request.getCardNum() == null || request.getAmount() == null){
+			throw new BadRequestException("All fields must be populated");
+		}
+		Long cardNum = request.getCardNum();
+		Optional<Card> foundCard = cardRepository.findByCardNum(cardNum);
+		BigDecimal refundAmount = new BigDecimal(request.getAmount()).setScale(2,RoundingMode.FLOOR);
+		if(foundCard.isEmpty()){
+			throw new NotFoundException("Card does not exist");
+		}
+		Card card = foundCard.get();
+		//Retrieve the account linked to the card.
+		Account linkedAccount = card.getAccount();
+
+
+		//Perform the refund operation to the account.
+		BigDecimal newBalance = linkedAccount.getBalance().add(refundAmount);
+		linkedAccount.setBalance(newBalance);
+
+		//create a transaction record for the refund.
+		Transaction record = new Transaction(card,linkedAccount,refundAmount,OffsetDateTime.now());
+
+		//save the updated account and transaction to the database
+		accountRepository.save(linkedAccount);
+		transactionRepository.save(record);
+
+		//return charge amount and card type
+		return new CardResult(card.getType(),refundAmount.doubleValue());
+	}
 	
 	
 	
