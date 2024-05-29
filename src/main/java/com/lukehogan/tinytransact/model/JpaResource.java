@@ -390,10 +390,25 @@ public class JpaResource {
 	}
 
 
-	// TODO Account Balance Check
+	// Account Balance Check
 	// Method POST /accounts/balance
 	// Inputs: Account number
 	// Outputs: Account holder name, current balance
+	@PostMapping("/accounts/balance")
+	public double balanceCheck(@RequestBody AccountRequest request){
+		//validate inputs
+		Integer acctNum = request.getAccountNumber();
+		if(acctNum == null){
+			throw new BadRequestException("Account number must be provided");
+		}
+		Optional<Account> foundAccount = accountRepository.findByAccountNumber(acctNum);
+		if(foundAccount.isEmpty()){
+			throw new NotFoundException("Account does not exist");
+		}
+
+		return foundAccount.get().getBalance().doubleValue();
+
+	}
 
 
 
