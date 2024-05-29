@@ -117,13 +117,17 @@ public class JpaResource {
 		if(foundAccount.isEmpty()) {
 			throw new NotFoundException(request.getAccountNumber().toString() + " Does Not Exist.");
 		}
+		Account account = foundAccount.get();
 		//Save the account balance to return
 		BigDecimal balance = foundAccount.get().getBalance();
 
-		// TODO delete all cards linked to the account. Just use the method we'll make for deleting cards.
-		
+		//delete all cards linked to the account.
+		for(Card card : account.getCards()){
+			cardRepository.delete(card);
+		}
+
 		//Delete the account
-		accountRepository.delete(foundAccount.get());
+		accountRepository.delete(account);
 		
 		return balance.setScale(2, RoundingMode.CEILING).floatValue();
 		
@@ -166,58 +170,12 @@ public class JpaResource {
 		}
 		
 	}
-	
-	
-	
-	//**Transaction Execution Methods**
-	
-	// TODO Credit Card Charge
-	// Method POST /card/charge
-	// Inputs: Card number, charge amount
-	// Outputs: Card Type, charge amount
-	
-	
-	
-	// TODO Credit Card Refund
-	// Method POST /card/refund
-	// Inputs: Card number, refund amount
-	// Outputs: Card Type, refund amount
-	
-	
-	
-	// TODO Account Deposit
-	// Method POST /accounts/deposit
-	// Inputs: Account number, deposit amount
-	// Outputs: Account holder name, deposit amount, balance after deposit
-	
-	
-	
-	// TODO Account Withdraw
-	// Method POST /accounts/withdraw
-	// Inputs: Account number, withdraw amount
-	// Outputs: Account holder name, withdraw amount, balance after withdraw
-	
-	
-	
-	// TODO Account Transfer
-	// Method POST /accounts/transfer
-	// Inputs: Account from, Account to, Transfer amount
-	// Outputs: from account holder name, to account holder name, transfer amount
-	
-	
-	
-	// TODO Account Balance Check
-	// Method POST /accounts/balance
-	// Inputs: Account number
-	// Outputs: Account holder name, current balance
-	
-	
-	
-	
 
-	
-	
-	//**Cards**
+
+
+
+	//**Card Methods**
+
 	// Issue new card
 	// Method POST /card
 	// Inputs: Account Number, Desired Type (Fusion, Zap, Posh or Fun). Create unique class to handle.
@@ -257,7 +215,7 @@ public class JpaResource {
 	}
 	
 	
-	// TODO Close existing card
+	// Close existing card
 	// Method POST /card/issue
 	// Inputs: Card number
 	// Outputs: None
@@ -309,7 +267,7 @@ public class JpaResource {
 	
 	
 	
-	//**Transactions**
+	//**Transaction Execution Methods**
 	
 	
 	// Account deposit
@@ -381,7 +339,64 @@ public class JpaResource {
 
 		return newBalance.doubleValue();
 	}
-	
+
+	// Account Transfer
+	// Method POST /accounts/transfer
+	// Inputs: Account from, Account to, Transfer amount
+	// Outputs: from account holder name, to account holder name, transfer amount
+	@PostMapping("/accounts/transfer")
+	public TransferResponse transfer(@RequestBody AccountTransferRequest request){
+		//Check inputs
+		if(request.getAccountFrom() == null || request.getAccountTo() == null || request.getAmount() == null){
+			throw new BadRequestException("Account From, Account To and Amount must be provided.");
+		}
+		BigDecimal amount = BigDecimal.valueOf(request.getAmount());
+		Optional<Account> foundFromAccount = accountRepository.findByAccountNumber(request.getAccountFrom());
+		Optional<Account> foundToAccount = accountRepository.findByAccountNumber(request.getAccountTo());
+
+		//Check that both from and to account exist
+		if(foundFromAccount.isEmpty()){
+			throw new NotFoundException("From account does not exist");
+		}
+		if(foundToAccount.isEmpty()){
+			throw new NotFoundException("To account does not exist");
+		}
+		Account fromAccount = foundFromAccount.get();
+		Account toAccount = foundToAccount.get();
+
+		//Check that from account has sufficient funds
+		if(fromAccount.getBalance().compareTo(amount) <0){
+			throw new BadRequestException("Insufficient Funds");
+		}
+
+		//Complete the transfer
+		BigDecimal newFromBalance = fromAccount.getBalance().subtract(amount);
+		BigDecimal newToBalance = toAccount.getBalance().add(amount);
+		fromAccount.setBalance(newFromBalance);
+		toAccount.setBalance(newToBalance);
+
+		//Create the transaction records
+		Transaction fromTransaction = new Transaction(fromAccount,amount.multiply(BigDecimal.valueOf(-1)),OffsetDateTime.now());
+		Transaction toTransaction = new Transaction(toAccount,amount,OffsetDateTime.now());
+		//Save updated accounts and transaction records to database
+		accountRepository.save(fromAccount);
+		accountRepository.save(toAccount);
+		transactionRepository.save(fromTransaction);
+		transactionRepository.save(toTransaction);
+
+		return new TransferResponse(fromAccount.getFirstName(), toAccount.getFirstName(),amount.doubleValue());
+
+
+	}
+
+
+	// TODO Account Balance Check
+	// Method POST /accounts/balance
+	// Inputs: Account number
+	// Outputs: Account holder name, current balance
+
+
+
 	
 	// Credit card charge
 	// Method PATCH /card/charge
@@ -428,7 +443,7 @@ public class JpaResource {
 	// Method PATCH /card/refund
 	// Inputs: Credit card number, refund amount (has to be 2 decimal places)
 	// Outputs: charge amount or insufficient funds
-	@PatchMapping("/card/charge")
+	@PatchMapping("/card/refund")
 	public CardResult cardRefund(@RequestBody CardTransactionRequest request){
 		//Validate input
 		if(request.getCardNum() == null || request.getAmount() == null){
@@ -459,8 +474,8 @@ public class JpaResource {
 		//return charge amount and card type
 		return new CardResult(card.getType(),refundAmount.doubleValue());
 	}
-	
-	
+
+
 	
 	//**Transaction Lookup Methods**
 	
@@ -564,6 +579,7 @@ public class JpaResource {
 	//Method POST /transactions/account
 	//Inputs: Card Number, Start date, End date
 	//Outputs: List of transactions within the range, for all cards and accounts
+	@PostMapping("/transactions/account")
 	public List<Transaction> getTransactionsByAccount(@RequestBody TransactionLookupRequest request){
 		Integer accountNum = request.getAccountNum();
 		OffsetDateTime beginTime = request.getBeginTimestamp();
