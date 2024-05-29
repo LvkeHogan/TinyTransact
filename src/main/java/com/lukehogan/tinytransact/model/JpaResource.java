@@ -311,7 +311,7 @@ public class JpaResource {
 	//**Transactions**
 	
 	
-	// TODO Account deposit
+	// Account deposit
 	// Method PATCH /accounts/deposit
 	// Inputs: Account Number, deposit amount (has to be 2 decimal places)
 	// Outputs: new balance
@@ -334,14 +334,39 @@ public class JpaResource {
 		BigDecimal newBalance = account.getBalance().add(depositAmount);
 		account.setBalance(newBalance);
 
+		accountRepository.save(account);
+
 		return newBalance.doubleValue();
 	}
 	
 	
-	// TODO Account withdraw
+	// Account withdraw
 	// Method PATCH /accounts/withdraw
 	// Inputs: Account Number, withdraw amount (has to be 2 decimal places)
-	// Outputs: new balance
+	// Outputs: withdrawn amount
+	@PatchMapping("/accounts/withdraw")
+	public double accountWithdraw(@RequestBody AccountTransactionRequest request){
+		//Validate input
+		if(request.getAccountNum() == null || request.getAmount() == null){
+			throw new BadRequestException("All fields must be populated");
+		}
+		Integer accountNum = request.getAccountNum();
+		Optional<Account> foundAccount = accountRepository.findByAccountNumber(accountNum);
+		if(foundAccount.isEmpty()){
+			throw new NotFoundException("Account does not exist");
+		}
+		//Check that decimal is to 2 decimal places. If not, round. Input should always be 2 decimal places.
+		BigDecimal withdrawAmount = new BigDecimal(request.getAmount()).setScale(2,RoundingMode.FLOOR);
+
+		//Perform the withdraw operation to the account.
+		Account account = foundAccount.get();
+		BigDecimal newBalance = account.getBalance().subtract(withdrawAmount);
+		account.setBalance(newBalance);
+
+		accountRepository.save(account);
+
+		return newBalance.doubleValue();
+	}
 	
 	
 	// TODO Credit card charge
