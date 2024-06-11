@@ -1,5 +1,7 @@
 package com.lukehogan.tinytransact.model;
 
+import org.springframework.stereotype.Component;
+
 public class CardRequest {
     private Long cardNumber;
     private String type;

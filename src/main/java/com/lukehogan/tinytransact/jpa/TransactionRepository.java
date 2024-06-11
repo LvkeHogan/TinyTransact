@@ -4,6 +4,8 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import com.lukehogan.tinytransact.model.Account;
+import com.lukehogan.tinytransact.model.Card;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.lukehogan.tinytransact.model.Transaction;
@@ -21,10 +23,10 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
 	Optional<List<Transaction>> findByTimeBetween(OffsetDateTime beginTime, OffsetDateTime endTime);
 	
 	//Find Account transactions by datetime range
-	Optional<List<Transaction>> findByAccountAndTimeBetween(int accountNum, OffsetDateTime beginTime, OffsetDateTime endTime);
+	Optional<List<Transaction>> findByAccountAndTimeBetween(Account account, OffsetDateTime beginTime, OffsetDateTime endTime);
 	
 	//Find Card transactions by datetime range
-	Optional<List<Transaction>> findByCardAndTimeBetween(Long cardNum, OffsetDateTime beginTime, OffsetDateTime endTime);
+	Optional<List<Transaction>> findByCardAndTimeBetween(Card card, OffsetDateTime beginTime, OffsetDateTime endTime);
 	
 }
 

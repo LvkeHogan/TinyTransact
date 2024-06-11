@@ -46,8 +46,7 @@ public class transact {
 
         return valid;
     }
-    
-    
+
     //Method for validating a given card (VERIFIED)
     public static String cardValidator(long cardNum){
         //get length of card number
@@ -180,7 +179,7 @@ public class transact {
     	double number = 0;
     	Random rand = new Random();
     	for(int i = 0; i < 9; i ++) {
-    		int newDigit = rand.nextInt(10);
+    		int newDigit = rand.nextInt(1,10);
     		number = number + newDigit * Math.pow((double)10,(double)i);
     		
     	}

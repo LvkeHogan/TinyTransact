@@ -1,5 +1,8 @@
 package com.lukehogan.tinytransact.model;
 
+import org.springframework.stereotype.Component;
+
+
 public class AccountTransferRequest {
     private Integer accountFrom;
     private Integer accountTo;

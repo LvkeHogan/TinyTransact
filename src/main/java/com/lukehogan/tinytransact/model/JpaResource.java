@@ -57,6 +57,10 @@ public class JpaResource {
 		if(acctNum == null) {
 			throw new BadRequestException("Account number must be provided");
 		}
+
+		if(acctNum.toString().length()!= 9){
+			throw new BadRequestException("Account number is not valid.");
+		}
 		
 		Optional<Account> result = accountRepository.findByAccountNumber(acctNum);
 		
@@ -93,6 +97,9 @@ public class JpaResource {
 				
 		//Update new account with its account number
 		newAccount.setAccountNumber(newAcctNum);
+
+		//Set balance to 0
+		newAccount.setBalance(BigDecimal.valueOf(0));
 		
 		//Persist it to the database
 		accountRepository.save(newAccount);
@@ -148,7 +155,7 @@ public class JpaResource {
 		//See if account exists. If it doesn't, throw an exception
 		Optional<Account> foundAccount = accountRepository.findByAccountNumber(request.getAccountNumber());
 		if(foundAccount.isEmpty()) {
-			throw new NotFoundException(request.getAccountNumber().toString() + " Does Not Exist.");
+			throw new NotFoundException("Account " + request.getAccountNumber().toString() + " Does Not Exist.");
 		}
 		Account account = foundAccount.get();
 		
@@ -168,6 +175,15 @@ public class JpaResource {
 		if(request.getPhoneNum() != null) {
 			account.setPhoneNum(request.getPhoneNum());
 		}
+		if(request.getFirstName() != null){
+			account.setFirstName(request.getFirstName());
+		}
+		if(request.getLastName() != null){
+			account.setFirstName(request.getLastName());
+		}
+
+		//save updated account to the database
+		accountRepository.save(account);
 		
 	}
 
@@ -556,11 +572,14 @@ public class JpaResource {
 		OffsetDateTime beginTime = request.getBeginTimestamp();
 		OffsetDateTime endTime = request.getEndTimestamp();
 		Optional<List<Transaction>> results;
-		
+		Optional<Card> card = cardRepository.findByCardNum(cardNum);
 		
 		//Check Inputs
 		if(cardNum == null) {
 			throw new BadRequestException("Card number must be provided.");
+		}
+		if(card.isEmpty()){
+			throw new NotFoundException("Card doesn't exist");
 		}
 		if(beginTime == null && endTime != null || beginTime != null && endTime == null) {
 			throw new BadRequestException("Both timestamps must be provided.");
@@ -578,11 +597,11 @@ public class JpaResource {
 			results = transactionRepository.findByCardId(cardNum);
 		}
 		else {
-			results = transactionRepository.findByCardAndTimeBetween(cardNum, beginTime, endTime);
+			results = transactionRepository.findByCardAndTimeBetween(card.get(), beginTime, endTime);
 		}
 		
 		if(results.isEmpty()) {
-			throw new NotFoundException(cardNum.toString());
+			throw new NotFoundException("No transactions for " + cardNum.toString());
 		}
 		
 		return results.get();
@@ -590,7 +609,7 @@ public class JpaResource {
 
 	}
 	
-	//Get transactions by account. Handle empty dates as wanting all.
+	//Get transactions by account and date range. Handle empty dates as wanting all.
 	//Method POST /transactions/account
 	//Inputs: Card Number, Start date, End date
 	//Outputs: List of transactions within the range, for all cards and accounts
@@ -599,12 +618,16 @@ public class JpaResource {
 		Integer accountNum = request.getAccountNum();
 		OffsetDateTime beginTime = request.getBeginTimestamp();
 		OffsetDateTime endTime = request.getEndTimestamp();
+		Optional<Account> account = accountRepository.findByAccountNumber(accountNum);
 		Optional<List<Transaction>> results;
 		
 		
 		//Check Inputs
 		if(accountNum == null) {
 			throw new BadRequestException("Card number must be provided.");
+		}
+		if(account.isEmpty()){
+			throw new NotFoundException("Account does not exist");
 		}
 		if(beginTime == null && endTime != null || beginTime != null && endTime == null) {
 			throw new BadRequestException("Both timestamps must be provided.");
@@ -622,7 +645,7 @@ public class JpaResource {
 			results = transactionRepository.findByAccountId(accountNum);
 		}
 		else {
-			results = transactionRepository.findByAccountAndTimeBetween(accountNum, beginTime, endTime);
+			results = transactionRepository.findByAccountAndTimeBetween(account.get(), beginTime, endTime);
 		}
 		
 		if(results.isEmpty()) {

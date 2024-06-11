@@ -3,6 +3,7 @@ package com.lukehogan.tinytransact.model;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.lukehogan.tinytransact.transact.transact;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -48,7 +49,7 @@ public class Account {
     }
 
     //auxiliary constructor
-    public Account(String firstName, String lastName, double balance, List<Card> cards) {
+    public Account(String firstName, String lastName, Double balance, List<Card> cards) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.balance = BigDecimal.valueOf(balance);
@@ -56,7 +57,7 @@ public class Account {
     }
     
     //Constructor for account creation
-    public Account(String firstName, String lastName, String address, String city, String state, int zipCode, long phoneNum, int accountNumber) {
+    public Account(String firstName, String lastName, String address, String city, String state, int zipCode, long phoneNum) {
     	this.firstName = firstName;
     	this.lastName = lastName;
     	this.address = address;
@@ -64,7 +65,7 @@ public class Account {
     	this.state = state;
     	this.zipCode = zipCode;
     	this.phoneNum = phoneNum;
-    	this.accountNumber = accountNumber;
+    	this.accountNumber = transact.generateAcctNum();
     	this.balance = new BigDecimal("0.00");
     }
 

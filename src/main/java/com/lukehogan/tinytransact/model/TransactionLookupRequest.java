@@ -4,7 +4,6 @@ import java.time.OffsetDateTime;
 
 import org.springframework.stereotype.Component;
 
-@Component
 public class TransactionLookupRequest {
 	
 	private OffsetDateTime beginTimestamp;

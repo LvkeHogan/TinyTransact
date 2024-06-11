@@ -1,5 +1,8 @@
 package com.lukehogan.tinytransact.model;
 
+import org.springframework.stereotype.Component;
+
+
 public class TransferResponse {
     private String From;
     private String To;

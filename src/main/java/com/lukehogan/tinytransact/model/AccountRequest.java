@@ -2,7 +2,6 @@ package com.lukehogan.tinytransact.model;
 
 import org.springframework.stereotype.Component;
 
-@Component
 public class AccountRequest {
 	private Integer accountNumber;
 	private String firstName;
@@ -58,6 +57,8 @@ public class AccountRequest {
 		this.state = state;
 		this.zipCode = zipCode;
 		this.phoneNum = phoneNum;
+	}
+	public AccountRequest(){
 	}
 
 	
